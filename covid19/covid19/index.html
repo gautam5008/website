@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+  #MyDashboardTable {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#MyDashboardTable td, #MyDashboardTable th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#MyDashboardTable tr:nth-child(even){background-color: #f2f2f2;}
+
+#MyDashboardTable tr:hover {background-color: #ddd;}
+
+#MyDashboardTable th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+  </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./resources/css/style.css" />
+  
+    <link rel="stylesheet" type="text/css" href="style2.css">
+    <title>COVID-19 STATS - JAVASCRIPT</title>
+  </head>
+  <body>
+    <center>
+      <br />
+     
+      <br />
+    </center>
+    <header>
+      <div class="logo">
+        <img src="./resources/img/logo.png" alt="" />
+        <p>COVID-19<br />STATS</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="">Home</a></li>
+          <a href="https://www.indiatvnews.com/coronavirus/helpline-numbers"><li>Contact & Helpline Information</a></li>
+          <li><a href="
+https://www.mohfw.gov.in/pdf/Revisedgu
+idelinesforInternationalArrivals02082020.
+pdf
+">Notifications & advisories</a></li>
+          <li><a href="#" onclick="Dashboard()">Hospital Dashboard</a></li>
+          <li><a href="#" onclick="if(window.location.href[window.location.href.length - 1] != '#'){mynewStatus()}else{window.location.href = window.location.href.replace('#','');}" >Sample tests & confirmed cases patients</a></li>
+          
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <div class="stats">
+        <div class="latest-report">
+          <div class="country">
+            <div class="name">Loading...</div>
+            <div class="change-country">change</div>
+            <div class="search-country hide">
+              <div class="search-box">
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="Search Country..."
+                />
+                <img class="close" src="./resources/img/close.svg" alt="" />
+              </div>
+              <div class="country-list"></div>
+            </div>
+          </div>
+          <div class="total-cases">
+            <div class="title">Total Cases</div>
+            <div class="value">0</div>
+            <div class="new-value">+0</div>
+          </div>
+          <div class="recovered">
+            <div class="title">Recovered</div>
+            <div class="value">0</div>
+            <div class="new-value">+0</div>
+          </div>
+          <div class="deaths">
+            <div class="title">Deaths</div>
+            <div class="value">0</div>
+            <div class="new-value">+0</div>
+          </div>
+        </div>
+        <div id="chartBOX" class="chart">
+          <canvas id="axes_line_chart"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-container">
+        <div class="copyright">
+          <p>Copyright © 2021 Code Explained</p>
+        </div>
+      </div>
+    </footer>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
+      integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      language="JavaScript"
+      src="http://www.geoplugin.net/javascript.gp"
+      type="text/javascript"
+    ></script>
+    <script src="resources/js/countries.js"></script>
+    <script src="resources/js/app.js"></script>
+
+  </body>
+<script>
+
+
+var totalJson = [];
+var requesting = {
+    method: "GET",
+    redirect: "follow"
+  };
+  async function myfunc (country) {
+    await fetch(
+      "https://api.rootnet.in/covid19-in/hospitals/beds",
+      requesting
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((x) => {
+        console.log(x.data);
+        totalJson = x.data.regional;
+      });
+
+  };
+  async function Dashboard(){
+    await myfunc();
+    tableFromJson();
+  }
+    function tableFromJson() {
+		// the json data. (you can change the values for output.)
+        var myBooks = totalJson;
+
+        // Extract value from table header. 
+        // ('Book ID', 'Book Name', 'Category' and 'Price')
+        var col = [];
+        for (var i = 0; i < myBooks.length; i++) {
+            for (var key in myBooks[i]) {
+                if (col.indexOf(key) === -1) {
+                    col.push(key);
+                }
+            }
+        }
+
+        // Create a table.
+        var table = document.createElement("table");
+
+        // Create table header row using the extracted headers above.
+        var tr = table.insertRow(-1);                   // table row.
+
+        for (var i = 0; i < col.length; i++) {
+            var th = document.createElement("th");      // table header.
+            th.innerHTML = col[i];
+            tr.appendChild(th);
+        }
+
+        // add json data to the table as rows.
+        for (var i = 0; i < myBooks.length; i++) {
+
+            tr = table.insertRow(-1);
+
+            for (var j = 0; j < col.length; j++) {
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = myBooks[i][col[j]];
+            }
+        }
+
+        // Now, add the newly created table with json data, to a container.
+        var divShowData = document.getElementById('chartBOX');
+        divShowData.innerHTML = "";
+        table.className = "logo";
+        table.id = "MyDashboardTable";
+        divShowData.appendChild(table);
+        
+        
+    }
+    
+    
+    // using ES6 features.
+    
+//     let tableFromJson = () => {
+//     	// the json data.
+//         const myBooks = [
+//             {'Book ID': '1', 'Book Name': 'Challenging Times',
+//                 'Category': 'Business', 'Price': '125.60'
+//             },
+//             {'Book ID': '2', 'Book Name': 'Learn JavaScript',
+//                 'Category': 'Programming', 'Price': '56.00'
+//             },
+//             {'Book ID': '3', 'Book Name': 'Popular Science',
+//                 'Category': 'Science', 'Price': '210.40'
+//             }
+//         ]
+        
+//         // Extract value from table header. 
+//         // ('Book ID', 'Book Name', 'Category' and 'Price')
+//         let col = [];
+//         for (let i = 0; i < myBooks.length; i++) {
+//             for (let key in myBooks[i]) {
+//                 if (col.indexOf(key) === -1) {
+//                     col.push(key);
+//                 }
+//             }
+//         }
+        
+//         // Create a table.
+//         const table = document.createElement("table");
+
+//         // Create table header row using the extracted headers above.
+//         let tr = table.insertRow(-1);                   // table row.
+
+//         for (let i = 0; i < col.length; i++) {
+//             let th = document.createElement("th");      // table header.
+//             th.innerHTML = col[i];
+//             tr.appendChild(th);
+//         }
+
+//         // add json data to the table as rows.
+//         for (let i = 0; i < myBooks.length; i++) {
+
+//             tr = table.insertRow(-1);
+
+//             for (let j = 0; j < col.length; j++) {
+//                 let tabCell = tr.insertCell(-1);
+//                 tabCell.innerHTML = myBooks[i][col[j]];
+//             }
+//         }
+
+//         // Now, add the newly created table with json data, to a container.
+//         const divShowData = document.getElementById('showData');
+//         divShowData.innerHTML = "";
+//         divShowData.appendChild(table);
+//     }
+</script>
+</html>
